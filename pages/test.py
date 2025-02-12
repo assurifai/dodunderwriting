@@ -137,6 +137,8 @@ def fetch_financial_info(text_map: Dict[str, List[str]]):
     with st.expander("See Progress"):
         for year, chunks in text_map.items():
             st.text(f"{len(chunks)} chunks found")
+            if len(chunks) == 0:
+                continue
             retriever = FAISS.from_texts(chunks, embeddings).as_retriever()
             qa = RetrievalQA.from_chain_type(
                 llm=ChatOpenAI(model="gpt-4o-mini", api_key=openai_api_key), retriever=retriever
