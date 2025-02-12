@@ -134,7 +134,7 @@ def fetch_financial_info(text_map: Dict[str, List[str]]):
     }
     ret_dict = defaultdict(lambda: defaultdict(str))
     with st.expander("See Progress"):
-        for year, chunks in list(text_map.items())[:1]:
+        for year, chunks in text_map.items():
             st.text(f"{len(chunks)} chunks found")
             retriever = FAISS.from_texts(chunks, embeddings).as_retriever()
             qa = RetrievalQA.from_chain_type(
