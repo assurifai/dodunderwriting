@@ -38,13 +38,13 @@ r = CachedSession("finapi", expire_after=datetime.timedelta(hours=1))
 
 
 openai_api_key = get_secret(ConfigKey.OPENAI)
-openai.api_key  = openai_api_key
+openai.api_key = openai_api_key
 SEC_API_KEY = get_secret(ConfigKey.SEC_API)
 
 
 query_api = QueryApi(api_key=SEC_API_KEY)
 
-embeddings = OpenAIEmbeddings(model="text-embedding-3-small", api_key = openai_api_key)
+embeddings = OpenAIEmbeddings(model="text-embedding-3-small", api_key=openai_api_key)
 
 headers = {
     "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:129.0) Gecko/20100101 Firefox/129.0",
@@ -111,12 +111,14 @@ def fetch_risk_related_info(text_map: Dict[str, List[str]]):
 
         retriever = FAISS.from_texts(chunks, embeddings).as_retriever()
         qa = RetrievalQA.from_chain_type(
-            llm=ChatOpenAI(model="gpt-4o-mini", api_key=openai_api_key), retriever=retriever
+            llm=ChatOpenAI(model="gpt-4o-mini", api_key=openai_api_key),
+            retriever=retriever,
         )
         response = str(qa.run(instruction))
         ret_dict[key] = response[response.index("{") : response.rindex("}") + 1]
 
     return ret_dict
+
 
 def fetch_financial_info(text_map: Dict[str, List[str]]):
     st.header("Financial info")
@@ -139,9 +141,11 @@ def fetch_financial_info(text_map: Dict[str, List[str]]):
             st.text(f"{len(chunks)} chunks found")
             if len(chunks) == 0:
                 continue
+
             retriever = FAISS.from_texts(chunks, embeddings).as_retriever()
             qa = RetrievalQA.from_chain_type(
-                llm=ChatOpenAI(model="gpt-4o-mini", api_key=openai_api_key), retriever=retriever
+                llm=ChatOpenAI(model="gpt-4o-mini", api_key=openai_api_key),
+                retriever=retriever,
             )
 
             for key, task in get_value_queries(year).items():
@@ -149,19 +153,23 @@ def fetch_financial_info(text_map: Dict[str, List[str]]):
                 st.text(key.capitalize())
                 response = """{}"""
                 with st.spinner("Calling API"):
+                    print(instruction)
                     response = str(qa.run(instruction))
                 response = response[response.index("{") : response.rindex("}") + 1]
                 print(response)
                 st.json(response)
                 ret_dict[key][year] = json.loads(response)["value"]
+
     ret_df = pd.DataFrame(ret_dict)
     st.dataframe(ret_df)
+
 
 def render_main():
     st.set_page_config(layout="wide")
     st.title("📄 PDF Query App")
 
-    ticker = st.text_input("Enter Company Ticker (e.g., AAPL, TSLA):")
+    ss.ticker = st.text_input("Enter Company Ticker (e.g., AAPL, TSLA):")
+    ticker = ss.ticker
     if not ticker:
         return
 
