@@ -1,4 +1,5 @@
 import datetime
+import concurrent.futures
 import json
 import os
 from typing import Dict, List
@@ -99,7 +100,8 @@ def fetch_risk_related_info(text_map: Dict[str, List[str]]):
 
     ret_dict = {}
 
-    for key, task in risk_queries.items():
+
+    def process_query(key, task):
         search, instruction = task
         chunks = [
             chunk
@@ -109,7 +111,7 @@ def fetch_risk_related_info(text_map: Dict[str, List[str]]):
 
         response = """{ "items": [] }"""
         if len(chunks) == 0:
-            continue
+            return key, None
 
         retriever = FAISS.from_texts(chunks, embeddings).as_retriever()
         qa = RetrievalQA.from_chain_type(
@@ -117,7 +119,13 @@ def fetch_risk_related_info(text_map: Dict[str, List[str]]):
             retriever=retriever,
         )
         response = str(qa.run(instruction))
-        ret_dict[key] = response[response.index("{") : response.rindex("}") + 1]
+        return key, response[response.index("{") : response.rindex("}") + 1]
+
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        results = executor.map(lambda item: process_query(*item), risk_queries.items())
+
+    for key, value in results:
+        ret_dict[key] = value
 
     return ret_dict
 
@@ -208,6 +216,7 @@ def render_main():
             info = None
             with st.spinner("Running..."):
                 info = fetch_risk_related_info(text_map)
+            st.json(json.dumps(info))
         fetch_financial_info(text_map)
 
     else:
