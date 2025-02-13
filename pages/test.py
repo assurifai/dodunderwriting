@@ -108,6 +108,8 @@ def fetch_risk_related_info(text_map: Dict[str, List[str]]):
         ]
 
         response = """{ "items": [] }"""
+        if len(chunks) == 0:
+            continue
 
         retriever = FAISS.from_texts(chunks, embeddings).as_retriever()
         qa = RetrievalQA.from_chain_type(
