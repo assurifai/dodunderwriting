@@ -10,80 +10,65 @@ value_format_instructions = value_parser.get_format_instructions()
 value_queries = [
     # Core Financials
     ("ebitda", "Income Statement, Notes", "Extract the operating income (EBITDA)."),
-    (
-        "revenue",
-        "Income Statement, Notes",
-        "Extract the net revenue or net sales globally.",
-    ),
-    (
-        "cogs",
-        "Income Statement, Notes",
-        "Extract the total cost of sales or cost of goods sold.",
-    ),
-    (
-        "net_income",
-        "Income Statement, Notes",
-        "Extract the net income or net earnings.",
-    ),
     # Profitability Ratios
     (
         "ebitda_margin",
         "Income Statement, Notes",
-        "Extract EBITDA percentage as a fraction of total revenue. Pull only from context.",
+        "Extract EBITDA percentage (EBITDA %).",
     ),
     (
         "gross_margin",
         "Income Statement, Notes",
-        "Extract the gross margin percentage, which is (Gross Profit / Revenue) * 100.",
+        "Extract the gross margin percentage (Gross Margin %)."
     ),
     (
         "net_income_margin",
         "Income Statement, Notes",
-        "Extract net income percentage, which is (Net Income / Revenue) * 100.",
+        "Extract net income percentage (Net Income %).",
     ),
     # Capital Allocation
     (
         "distributions",
         "Cash Flow Statement (Financing)",
-        "Extract the net distributions the company has done, including stock buybacks and dividends. If neither is mentioned, return 0.",
+        "Extract the net distributions the company has done, including stock buybacks and dividends (Distributions).",
     ),
     # Liquidity Ratios
     (
         "current_ratio",
         "Balance Sheet",
-        "Extract the current ratio, which is (Total Current Assets / Total Current Liabilities).",
+        "Extract the current ratio: (Current Ratio).",
     ),
     # Debt Ratios
     (
         "senior_funded_debt_to_ebitda",
         "Balance Sheet, Income Statement",
-        "Extract the Senior Funded Debt to EBITDA ratio, calculated as (Long-Term Debt / EBITDA).",
+        "Extract the Senior Funded Debt / EBITDA ratio.",
     ),
     (
         "total_debt_to_ebitda",
         "Balance Sheet, Income Statement",
-        "Extract the Total Debt to EBITDA ratio, calculated as (Total Debt / EBITDA).",
+        "Extract the Total Debt / EBITDA ratio.",
     ),
     (
         "tangible_net_worth",
         "Balance Sheet",
-        "Extract Tangible Net Worth (TNW), calculated as (Total Stockholders' Equity - Intangible Assets - Goodwill).",
+        "Extract Tangible Net Worth (TNW).",
     ),
     (
         "balance_sheet_leverage",
         "Balance Sheet",
-        "Extract the Balance Sheet Leverage ratio, calculated as (Total Assets / Total Equity).",
+        "Extract the Balance Sheet Leverage (B/S Leverage) ratio.",
     ),
     # Coverage Ratios
     (
         "debt_service_ratio",
         "Income Statement, Balance Sheet",
-        "Extract the Debt Service Ratio, calculated as (EBITDA / (Interest Expense + Current Portion of Long-Term Debt)).",
+        "Extract the Debt Service Ratio.",
     ),
     (
         "fixed_charge_ratio",
         "Income Statement, Balance Sheet",
-        "Extract the Fixed Charge Coverage Ratio, calculated as (EBITDA / (Interest Expense + Capital Expenditures)).",
+        "Extract the Fixed Charge Coverage Ratio (Fixed Charge Ratio).",
     ),
     # Capital Expenditures & Debt Movement
     (
@@ -94,49 +79,49 @@ value_queries = [
     (
         "asset_disposition",
         "Cash Flow Statement (Investing)",
-        "Extract the amount received from the sale of assets (property, plant, equipment).",
+        "Extract the Asset Disposition.",
     ),
     (
         "change_in_debt",
         "Balance Sheet",
-        "Extract the change in total debt compared to the previous reporting period.",
+        "Extract the Change in Debt.",
     ),
     # Working Capital Cycle
     (
         "receivables_days",
         "Balance Sheet, Income Statement",
-        "Extract Days Sales Outstanding (DSO), calculated as (Accounts Receivable / Revenue) * 365.",
+        "Extract Days Sales Outstanding (DSO), or Receivable Days (DSO).",
     ),
     (
         "inventory_days",
         "Balance Sheet, Income Statement",
-        "Extract Inventory Days, calculated as (Inventory / Cost of Goods Sold) * 365.",
+        "Extract Inventory Days.",
     ),
     (
         "payable_days",
         "Balance Sheet, Income Statement",
-        "Extract Days Payables Outstanding (DPO), calculated as (Accounts Payable / Cost of Goods Sold) * 365.",
+        "Extract Payables Days Outstanding (DPO).",
     ),
     (
         "cash_conversion_cycle",
         "Balance Sheet, Income Statement",
-        "Extract the Cash Conversion Cycle, calculated as (DSO + Inventory Days - DPO).",
+        "Extract the Cash Conversion Cycle.",
     ),
     # Cash Flow & Liquidity
     (
         "cash_burn_rate",
         "Cash Flow Statement",
-        "Extract the Cash Burn Rate, which is the negative operating cash flow (if cash flow from operations is negative).",
+        "Extract the Cash Burn Rate.",
     ),
     (
         "days_cash_on_hand",
         "Balance Sheet, Income Statement",
-        "Extract the Days Cash on Hand, calculated as (Cash and Cash Equivalents / (Cost of Goods Sold / 365)).",
+        "Extract the Days Cash on Hand.",
     ),
 ]
 
 value_template = PromptTemplate(
-    template="Analyze the following financials-related excerpts from a 10-K annual report for a company for the year {year}. Make sure you only extract figures for the year {year}, not past years. Pay attention specifically to the following sections: {section}. Make sure you return dollar amounts in terms of millions of USD. {instruction}\n context: {context} \n Provide a structured response.\n{format_instructions}",
+    template="Analyze the following financials-related excerpts from a 10-K annual report for a company for the year {year}. Make sure you only extract figures for the year {year}, not past years. Pay attention specifically to the following sections: {section}. Make sure you return dollar amounts in terms of USD. {instruction}\n context: {context} \n Provide a structured response.\n{format_instructions}",
     input_variables=["year", "section", "instruction", "context"],
     partial_variables={"format_instructions": value_format_instructions},
 )

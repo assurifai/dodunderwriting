@@ -7,7 +7,7 @@ def inject_context(year):
     ref_df = compute_financial_metrics(ss.ticker)
 
     if ref_df is not None:
-        return f"Context: through an API, we have found these values for the given year: {ref_df[ref_df.index == year].iloc[0]}. If the figure you found was significantly different, return the value from the API."
+        return f"As additional information: Whrough an API, we have found these values for the given year: {ref_df[ref_df.index == year].iloc[0]}. Return the associated value from the API."
 
     return ""
 
